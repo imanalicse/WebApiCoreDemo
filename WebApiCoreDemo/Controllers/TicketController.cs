@@ -2,6 +2,8 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApiCoreDemo.Data;
+using WebApiCoreDemo.Model;
 
 namespace WebApiCoreDemo.Controllers
 {
@@ -9,9 +11,9 @@ namespace WebApiCoreDemo.Controllers
     [Route("api/[controller]")]
     public class TicketController : Controller
     {
-        private TicketContext _context;
+        private ApplicationDbContext _context;
 
-        public TicketController(TicketContext context)
+        public TicketController(ApplicationDbContext context)
         {
             _context = context;
 
