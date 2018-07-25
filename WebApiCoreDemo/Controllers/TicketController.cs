@@ -14,20 +14,17 @@ namespace WebApiCoreDemo.Controllers
     {
         //private ApplicationDbContext _context;
         public IRepository<TicketItem> _repository;
+        public IUnitOfWork _unitOfWork;
 
         public TicketController(
             //ApplicationDbContext context,
-            IRepository<TicketItem> repository
+            IRepository<TicketItem> repository,
+            IUnitOfWork unitOfWork
             )
         {
             //_context = context;
             _repository = repository;
-
-            if (_repository.Count() == 0)
-            {                
-                _repository.Add(new TicketItem { Concert = "First concert" });
-                _repository.SaveChanges();
-            }
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -40,11 +37,11 @@ namespace WebApiCoreDemo.Controllers
 
         [HttpGet("{id}", Name = "GetTicket")]
         public IActionResult GetById(long id)
-        {            
+        {
             var ticket = _repository.Get(id);
             if (ticket == null)
             {
-                return NotFound();                          
+                return NotFound();
             }
             return new ObjectResult(ticket);
         }
@@ -57,7 +54,7 @@ namespace WebApiCoreDemo.Controllers
                 return BadRequest();
             }
             _repository.Add(ticket);
-            _repository.SaveChanges();
+            _unitOfWork.SaveChanges();
             return CreatedAtRoute("GetTicket", new { id = ticket.Id }, ticket);
         }
 
@@ -80,7 +77,7 @@ namespace WebApiCoreDemo.Controllers
             tic.Available = ticket.Available;
 
             _repository.Update(tic);
-            _repository.SaveChanges();
+            _unitOfWork.SaveChanges();
 
             return new OkResult();
         }
@@ -95,7 +92,7 @@ namespace WebApiCoreDemo.Controllers
                 return NotFound();
             }
             _repository.Remove(entity);
-            _repository.SaveChanges();
+            _unitOfWork.SaveChanges();
 
             return new NoContentResult();
         }
