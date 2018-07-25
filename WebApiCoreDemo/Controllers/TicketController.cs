@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiCoreDemo.Data;
 using WebApiCoreDemo.Model;
+using WebApiCoreDemo.Repositories;
 
 namespace WebApiCoreDemo.Controllers
 {
@@ -11,35 +12,40 @@ namespace WebApiCoreDemo.Controllers
     [Route("api/[controller]")]
     public class TicketController : Controller
     {
-        private ApplicationDbContext _context;
+        //private ApplicationDbContext _context;
+        public IRepository<TicketItem> _repository;
 
-        public TicketController(ApplicationDbContext context)
+        public TicketController(
+            //ApplicationDbContext context,
+            IRepository<TicketItem> repository
+            )
         {
-            _context = context;
+            //_context = context;
+            _repository = repository;
 
-            if (_context.TicketItems.Count() == 0)
-            {
-                _context.TicketItems.Add(new TicketItem { Concert = "Beyonce" });
-                _context.SaveChanges();
+            if (_repository.Count() == 0)
+            {                
+                _repository.Add(new TicketItem { Concert = "First concert" });
+                _repository.SaveChanges();
             }
         }
 
         [HttpGet]
         public IEnumerable<TicketItem> GetAll()
         {
-            return _context.TicketItems.AsNoTracking().ToList();
+            var tickets = _repository.GetAll();
+            return tickets;
+            //return _context.TicketItems.AsNoTracking().ToList();
         }
 
         [HttpGet("{id}", Name = "GetTicket")]
         public IActionResult GetById(long id)
-        {
-            var ticket = _context.TicketItems.FirstOrDefault(t => t.Id == id);
-
+        {            
+            var ticket = _repository.Get(id);
             if (ticket == null)
             {
-                return NotFound(); // 404                              
+                return NotFound();                          
             }
-
             return new ObjectResult(ticket);
         }
 
@@ -50,10 +56,8 @@ namespace WebApiCoreDemo.Controllers
             {
                 return BadRequest();
             }
-            _context.TicketItems.Add(ticket);
-            _context.SaveChanges();
-
-            //Return "/Ticket/" + ticket.Id
+            _repository.Add(ticket);
+            _repository.SaveChanges();
             return CreatedAtRoute("GetTicket", new { id = ticket.Id }, ticket);
         }
 
@@ -65,7 +69,7 @@ namespace WebApiCoreDemo.Controllers
                 return BadRequest();
             }
 
-            var tic = _context.TicketItems.FirstOrDefault(t => t.Id == id);
+            var tic = _repository.Get(id);
             if (tic == null)
             {
                 return NotFound();
@@ -75,22 +79,24 @@ namespace WebApiCoreDemo.Controllers
             tic.Artist = ticket.Artist;
             tic.Available = ticket.Available;
 
-            _context.TicketItems.Update(tic);
-            _context.SaveChanges();
+            _repository.Update(tic);
+            _repository.SaveChanges();
 
-            return new NoContentResult();
+            return new OkResult();
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
-            var tic = _context.TicketItems.FirstOrDefault(t => t.Id == id);
-            if (tic == null)
+            //var tic = _context.TicketItems.FirstOrDefault(t => t.Id == id);
+            var entity = _repository.Get(id);
+            if (entity == null)
             {
                 return NotFound();
             }
-            _context.TicketItems.Remove(tic);
-            _context.SaveChanges();
+            _repository.Remove(entity);
+            _repository.SaveChanges();
+
             return new NoContentResult();
         }
     }

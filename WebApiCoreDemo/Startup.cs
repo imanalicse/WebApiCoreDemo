@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using WebApiCoreDemo.Data;
+using WebApiCoreDemo.Repositories;
 
 namespace WebApiCoreDemo
 {
@@ -35,8 +36,10 @@ namespace WebApiCoreDemo
             {
                 c.SwaggerDoc("v1", new Info { Title = "Concert API", Version = "v1" });
             });
-
+            
             services.AddDbContext<ApplicationDbContext>(option => option.UseInMemoryDatabase("TicketList"));
+
+            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
