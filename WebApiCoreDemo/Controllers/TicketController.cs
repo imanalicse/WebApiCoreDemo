@@ -12,17 +12,14 @@ namespace WebApiCoreDemo.Controllers
     [Route("api/[controller]")]
     public class TicketController : Controller
     {
-        //private ApplicationDbContext _context;
         public IRepository<TicketItem> _repository;
         public IUnitOfWork _unitOfWork;
 
         public TicketController(
-            //ApplicationDbContext context,
             IRepository<TicketItem> repository,
             IUnitOfWork unitOfWork
             )
-        {
-            //_context = context;
+        {            
             _repository = repository;
             _unitOfWork = unitOfWork;
         }
@@ -85,7 +82,6 @@ namespace WebApiCoreDemo.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
-            //var tic = _context.TicketItems.FirstOrDefault(t => t.Id == id);
             var entity = _repository.Get(id);
             if (entity == null)
             {
