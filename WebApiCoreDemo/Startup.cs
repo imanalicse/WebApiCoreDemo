@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using WebApiCoreDemo.Automapper;
 using WebApiCoreDemo.Data;
 using WebApiCoreDemo.Repositories;
 
@@ -40,7 +41,16 @@ namespace WebApiCoreDemo
             services.AddDbContext<ApplicationDbContext>(option => option.UseInMemoryDatabase("TicketList"));
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));            
+            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+
+            // Auto Mapper
+            var config = new AutoMapper.MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutomapperProfile());
+            });
+
+            var mapper = config.CreateMapper();
+            services.AddSingleton(mapper);            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

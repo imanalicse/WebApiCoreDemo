@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using WebApiCoreDemo.Model;
 using WebApiCoreDemo.Repositories;
@@ -11,18 +12,24 @@ namespace WebApiCoreDemo.Controllers
     {
 
         public IUnitOfWork _unitOfWork;
+        public readonly IMapper _mapper;
 
         public TicketController(
-            IUnitOfWork unitOfWork )
+            IUnitOfWork unitOfWork,
+            IMapper mapper
+            )
         {            
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
+
         }
 
         [HttpGet]
-        public IEnumerable<TicketItem> GetAll()
+        public IEnumerable<TicketItemViewModel> GetAll()
         {
             var tickets = _unitOfWork.GetRepository<TicketItem>().GetAll();
-            return tickets;
+            var mapperTtem = _mapper.Map<List<TicketItemViewModel>>(tickets);
+            return mapperTtem;
             //return _context.TicketItems.AsNoTracking().ToList();
         }
 
