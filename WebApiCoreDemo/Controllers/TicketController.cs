@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApiCoreDemo.Data;
 using WebApiCoreDemo.Model;
 using WebApiCoreDemo.Repositories;
 
@@ -12,22 +9,19 @@ namespace WebApiCoreDemo.Controllers
     [Route("api/[controller]")]
     public class TicketController : Controller
     {
-        public IRepository<TicketItem> _repository;
+
         public IUnitOfWork _unitOfWork;
 
         public TicketController(
-            IRepository<TicketItem> repository,
-            IUnitOfWork unitOfWork
-            )
+            IUnitOfWork unitOfWork )
         {            
-            _repository = repository;
             _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public IEnumerable<TicketItem> GetAll()
         {
-            var tickets = _repository.GetAll();
+            var tickets = _unitOfWork.GetRepository<TicketItem>().GetAll();
             return tickets;
             //return _context.TicketItems.AsNoTracking().ToList();
         }
@@ -35,7 +29,7 @@ namespace WebApiCoreDemo.Controllers
         [HttpGet("{id}", Name = "GetTicket")]
         public IActionResult GetById(long id)
         {
-            var ticket = _repository.Get(id);
+            var ticket = _unitOfWork.GetRepository<TicketItem>().Get(id);
             if (ticket == null)
             {
                 return NotFound();
@@ -50,7 +44,7 @@ namespace WebApiCoreDemo.Controllers
             {
                 return BadRequest();
             }
-            _repository.Add(ticket);
+            _unitOfWork.GetRepository<TicketItem>().Add(ticket);
             _unitOfWork.SaveChanges();
             return CreatedAtRoute("GetTicket", new { id = ticket.Id }, ticket);
         }
@@ -63,7 +57,7 @@ namespace WebApiCoreDemo.Controllers
                 return BadRequest();
             }
 
-            var tic = _repository.Get(id);
+            var tic = _unitOfWork.GetRepository<TicketItem>().Get(id);
             if (tic == null)
             {
                 return NotFound();
@@ -73,7 +67,7 @@ namespace WebApiCoreDemo.Controllers
             tic.Artist = ticket.Artist;
             tic.Available = ticket.Available;
 
-            _repository.Update(tic);
+            _unitOfWork.GetRepository<TicketItem>().Update(tic);
             _unitOfWork.SaveChanges();
 
             return new OkResult();
@@ -82,12 +76,12 @@ namespace WebApiCoreDemo.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
-            var entity = _repository.Get(id);
+            var entity = _unitOfWork.GetRepository<TicketItem>().Get(id);
             if (entity == null)
             {
                 return NotFound();
             }
-            _repository.Remove(entity);
+            _unitOfWork.GetRepository<TicketItem>().Remove(entity);
             _unitOfWork.SaveChanges();
 
             return new NoContentResult();

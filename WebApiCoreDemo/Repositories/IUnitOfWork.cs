@@ -2,6 +2,7 @@
 {
     public interface IUnitOfWork
     {
-        int SaveChanges();       
+        int SaveChanges();
+        IRepository<TEntity> GetRepository<TEntity>() where TEntity : class;
     }
 }

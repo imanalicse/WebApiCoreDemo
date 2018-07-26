@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebApiCoreDemo.Data;
+﻿using WebApiCoreDemo.Data;
 
 namespace WebApiCoreDemo.Repositories
 {
@@ -14,6 +10,13 @@ namespace WebApiCoreDemo.Repositories
         {
             _context = context;
         }
+
+        public IRepository<TEntity> GetRepository<TEntity>() where TEntity : class
+        {
+            var repo = new Repository<TEntity>(_context);
+            return repo;
+        }
+
         public int SaveChanges()
         {
             return _context.SaveChanges();
