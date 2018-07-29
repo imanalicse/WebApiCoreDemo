@@ -10,6 +10,7 @@ namespace WebApiCoreDemo.Model
         public long Id { get; set; }
         public string Concert { get; set; }
         public string Artist { get; set; }
+        public int postCode { get; set; }
         public bool Available { get; set; }
     }
 }

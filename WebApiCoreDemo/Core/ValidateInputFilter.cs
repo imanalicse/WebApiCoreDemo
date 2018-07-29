@@ -21,17 +21,15 @@ namespace WebApiCoreDemo.Core
        
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if(context.ModelState.IsValid)
+            if(!context.ModelState.IsValid)
             {
-                return;
-            }
-
-            context.Result = new BadRequestObjectResult(context.ModelState);
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }            
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            //throw new NotImplementedException();
+            
         }
     }
 }
