@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using WebApiCoreDemo.Automapper;
 using WebApiCoreDemo.Data;
 using WebApiCoreDemo.Repositories;
+using FluentValidation.AspNetCore;
 
 namespace WebApiCoreDemo
 {
@@ -31,13 +32,17 @@ namespace WebApiCoreDemo
             //services.AddDbContext<ApplicationDbContext>(options =>
             //   options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddMvc();
-            
+            services.AddMvc()
+                .AddMvcOptions(options => options.Filters.Add(typeof(Core.ValidateInputFilter)))
+                .AddFluentValidation(fvc =>
+                    fvc.RegisterValidatorsFromAssemblyContaining<Startup>()
+                );
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Concert API", Version = "v1" });
             });
-            
+
             services.AddDbContext<ApplicationDbContext>(option => option.UseInMemoryDatabase("TicketList"));
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
@@ -50,7 +55,7 @@ namespace WebApiCoreDemo
             });
 
             var mapper = config.CreateMapper();
-            services.AddSingleton(mapper);            
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
