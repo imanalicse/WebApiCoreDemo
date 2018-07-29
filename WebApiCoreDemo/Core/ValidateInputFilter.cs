@@ -23,7 +23,20 @@ namespace WebApiCoreDemo.Core
         {
             if(!context.ModelState.IsValid)
             {
-                context.Result = new BadRequestObjectResult(context.ModelState);
+                //context.Result = new BadRequestObjectResult(context.ModelState);
+
+                context.Result = new BadRequestObjectResult(new
+                {
+                    Data = from kvp in context.ModelState
+                           from err in kvp.Value.Errors
+                           let k = kvp.Key
+                           select new ValidationError(ValidationError.ErrorType.Input, (HttpStatusCode)422, k, string.IsNullOrEmpty(err.ErrorMessage) ? "Invalid Input" : err.ErrorMessage),
+                    Status = new
+                    {
+                        Code = 422,
+                        Message = "Validation error."
+                    }
+                });
             }            
         }
 
